@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev" : "watchify index.js -o output/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,5 +12,8 @@
   "dependencies": {
     "rx": "^4.1.0",
     "rxjs": "^5.0.3"
+  },
+  "devDependencies": {
+    "watchify": "^3.8.0"
   }
 }

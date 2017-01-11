@@ -25,7 +25,7 @@ $(document).ready(() => {
     .map(arr => arr.length)
     .filter(len => len === 2);
 
-  doubleClickStream.subscribe(event => label.text('double clicked!'));
+  doubleClickStream.subscribe(event => label.text('button is double clicked!!'));
 
   doubleClickStream.delay(1000).subscribe(suggestion => label.text('-'));
 });
