@@ -30,8 +30,19 @@ $(document).ready(() => {
 
   doubleClickStream.delay(1000).subscribe(suggestion => label.text('-'));
 
-  const requestStream = Rx.Observable.of('https://api.github.com/users');
-  const responseStream = requestStream
+  const startupRequestStream = Rx.Observable.of('https://api.github.com/users');
+
+
+  //
+  const refreshButton = $('.refresh');
+
+  const refreshStream = Rx.Observable.fromEvent(refreshButton, 'click');
+
+  const requestOnRefreshStream = refreshStream.map(event => {
+    const random = Math.floor(Math.random() * 500);
+    return `https://api.github.com/users?since=${random}`;
+  });
+  const responseStream = requestOnRefreshStream.merge(startupRequestStream)
     .flatMap(url => Rx.Observable.fromPromise($.getJSON(url)));
 
   responseStream.subscribe(res => {
