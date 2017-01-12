@@ -52,9 +52,17 @@ $(document).ready(() => {
     console.log(res);
   })
 
-  const suggestionStream1 = createSuggestionStream(responseStream, refreshStream);
-  const suggestionStream2 = createSuggestionStream(responseStream, refreshStream);
-  const suggestionStream3 = createSuggestionStream(responseStream, refreshStream);
+  const close1 = $('.close1');
+  const close2 = $('.close2');
+  const close3 = $('.close3');
+
+  const close1ClickStream = Rx.Observable.fromEvent(close1, 'click');
+  const close2ClickStream = Rx.Observable.fromEvent(close2, 'click');
+  const close3ClickStream = Rx.Observable.fromEvent(close3, 'click');
+
+  const suggestionStream1 = createSuggestionStream(responseStream, refreshStream, close1ClickStream);
+  const suggestionStream2 = createSuggestionStream(responseStream, refreshStream, close2ClickStream);
+  const suggestionStream3 = createSuggestionStream(responseStream, refreshStream, close3ClickStream);
 
 
   suggestionStream1.subscribe(_.curry(renderSuggestion)('.suggestion1'));
@@ -62,10 +70,13 @@ $(document).ready(() => {
   suggestionStream3.subscribe(_.curry(renderSuggestion)('.suggestion3'));
 });
 
-const createSuggestionStream = (responseStream, refreshStream) => {
-  return responseStream.map(listUser => listUser[Math.floor(Math.random() * listUser.length)])
+const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
+  let randomUser = listUser => listUser[Math.floor(Math.random() * listUser.length)];
+
+  return responseStream.map(randomUser)
     .startWith(null)
-    .merge(refreshStream.map(event => null));
+    .merge(refreshStream.map(event => null))
+    .merge(closeClickStream.withLatestFrom(responseStream, (event, listUsers) => randomUser(listUsers)));
 }
 
 const renderSuggestion = (selector, userData) => {
