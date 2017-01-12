@@ -43,7 +43,10 @@ $(document).ready(() => {
     return `https://api.github.com/users?since=${random}`;
   });
   const responseStream = requestOnRefreshStream.merge(startupRequestStream)
-    .flatMap(url => Rx.Observable.fromPromise($.getJSON(url)));
+    .flatMap(url => {
+      console.log('do network request');
+      return Rx.Observable.fromPromise($.getJSON(url))
+    }).publishReplay(1).refCount();
 
   responseStream.subscribe(res => {
     console.log(res);
