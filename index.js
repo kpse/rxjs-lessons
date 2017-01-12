@@ -49,9 +49,9 @@ $(document).ready(() => {
     console.log(res);
   })
 
-  const suggestionStream1 = createSuggestionStream(responseStream);
-  const suggestionStream2 = createSuggestionStream(responseStream);
-  const suggestionStream3 = createSuggestionStream(responseStream);
+  const suggestionStream1 = createSuggestionStream(responseStream, refreshStream);
+  const suggestionStream2 = createSuggestionStream(responseStream, refreshStream);
+  const suggestionStream3 = createSuggestionStream(responseStream, refreshStream);
 
 
   suggestionStream1.subscribe(_.curry(renderSuggestion)('.suggestion1'));
@@ -59,9 +59,18 @@ $(document).ready(() => {
   suggestionStream3.subscribe(_.curry(renderSuggestion)('.suggestion3'));
 });
 
-const createSuggestionStream = responseStream => responseStream.map(listUser => listUser[Math.floor(Math.random() * listUser.length)]);
+const createSuggestionStream = (responseStream, refreshStream) => {
+  return responseStream.map(listUser => listUser[Math.floor(Math.random() * listUser.length)])
+    .startWith(null)
+    .merge(refreshStream.map(event => null));
+}
 
 const renderSuggestion = (selector, userData) => {
+  if(userData === null) {
+    $(selector).hide();
+    return;
+  }
+  $(selector).show();
   let userElem = $('.username', selector);
   console.log('userElem', userElem);
   userElem.attr('href', userData.html_url);
