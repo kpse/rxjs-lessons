@@ -68,6 +68,15 @@ $(document).ready(() => {
   suggestionStream1.subscribe(_.curry(renderSuggestion)('.suggestion1'));
   suggestionStream2.subscribe(_.curry(renderSuggestion)('.suggestion2'));
   suggestionStream3.subscribe(_.curry(renderSuggestion)('.suggestion3'));
+
+  const startButton = $('#start');
+
+  const start = Rx.Observable.fromEvent(startButton, 'click');
+  const interval = () => Rx.Observable.interval(1000);
+
+  const startInterval = start.switchMap(interval);
+
+  startInterval.subscribe((x) => console.log(x));
 });
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
