@@ -73,10 +73,14 @@ $(document).ready(() => {
 
   const start = Rx.Observable.fromEvent(startButton, 'click');
   const interval = () => Rx.Observable.interval(1000);
+  const stop = Rx.Observable.fromEvent($('#stop'), 'click');
 
-  const startInterval = start.switchMap(interval);
+  const intervalStop = interval().takeUntil(stop);
 
+
+  const startInterval = start.switchMapTo(intervalStop);
   startInterval.subscribe((x) => console.log(x));
+
 });
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
