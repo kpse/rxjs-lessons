@@ -78,7 +78,10 @@ $(document).ready(() => {
   const intervalStop = interval().takeUntil(stop);
 
 
-  const startInterval = start.switchMapTo(intervalStop);
+  const startInterval = start.switchMapTo(intervalStop)
+    .scan((acc) => {
+      return {count: acc.count + 1}
+    }, {count: 0});
   startInterval.subscribe((x) => console.log(x));
 
 });
@@ -93,7 +96,7 @@ const createSuggestionStream = (responseStream, refreshStream, closeClickStream)
 }
 
 const renderSuggestion = (selector, userData) => {
-  if(userData === null) {
+  if (userData === null) {
     $(selector).hide();
     return;
   }
