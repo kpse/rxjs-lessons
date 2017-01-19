@@ -77,11 +77,13 @@ $(document).ready(() => {
 
   const intervalStop = interval().takeUntil(stop);
 
+  const data = {count: 0}
 
   const startInterval = start.switchMapTo(intervalStop)
+    .startWith(data)
     .scan((acc) => {
       return {count: acc.count + 1}
-    }, {count: 0});
+    });
   startInterval.subscribe((x) => console.log(x));
 
 });
