@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const Rx = require('rxjs');
 const _ = require('lodash');
@@ -50,7 +50,7 @@ $(document).ready(() => {
 
   responseStream.subscribe(res => {
     console.log(res);
-  })
+  });
 
   const close1 = $('.close1');
   const close2 = $('.close2');
@@ -77,13 +77,14 @@ $(document).ready(() => {
 
   const intervalStop = interval().takeUntil(stop);
 
-  const data = {count: 0}
+  const data = {count: 0};
+  const inc = (acc) => {acc.count + 1};
+  const reset = (acc) => data;
 
   const startInterval = start.switchMapTo(intervalStop)
+    .mapTo(inc)
     .startWith(data)
-    .scan((acc) => {
-      return {count: acc.count + 1}
-    });
+    .scan((acc, curr) => curr(acc));
   startInterval.subscribe((x) => console.log(x));
 
 });
@@ -95,7 +96,7 @@ const createSuggestionStream = (responseStream, refreshStream, closeClickStream)
     .startWith(null)
     .merge(refreshStream.map(event => null))
     .merge(closeClickStream.withLatestFrom(responseStream, (event, listUsers) => randomUser(listUsers)));
-}
+};
 
 const renderSuggestion = (selector, userData) => {
   if (userData === null) {
@@ -109,5 +110,5 @@ const renderSuggestion = (selector, userData) => {
   userElem.text(userData.login);
   const imgElem = $('img', selector);
   imgElem.attr('src', userData.avatar_url);
-}
+};
 
