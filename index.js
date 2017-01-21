@@ -70,19 +70,24 @@ $(document).ready(() => {
   suggestionStream3.subscribe(_.curry(renderSuggestion)('.suggestion3'));
 
   const startButton = $('#start');
+  const resetButton = $('#reset');
 
   const start = Rx.Observable.fromEvent(startButton, 'click');
+  const resetClick = Rx.Observable.fromEvent(resetButton, 'click');
   const interval = () => Rx.Observable.interval(1000);
   const stop = Rx.Observable.fromEvent($('#stop'), 'click');
 
   const intervalStop = interval().takeUntil(stop);
 
   const data = {count: 0};
-  const inc = (acc) => {acc.count + 1};
+  const inc = (acc) => ({count: acc.count + 1});
   const reset = (acc) => data;
 
-  const startInterval = start.switchMapTo(intervalStop)
-    .mapTo(inc)
+  const incOrReset = Rx.Observable.merge(
+    intervalStop.mapTo(inc),
+    resetClick.mapTo(reset)
+  );
+  const startInterval = start.switchMapTo(incOrReset)
     .startWith(data)
     .scan((acc, curr) => curr(acc));
   startInterval.subscribe((x) => console.log(x));
