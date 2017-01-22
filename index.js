@@ -71,9 +71,13 @@ $(document).ready(() => {
 
   const startButton = $('#start');
   const resetButton = $('#reset');
+  const halfButton = $('#half');
+  const quarterButton = $('#quarter');
 
   const start = Rx.Observable.fromEvent(startButton, 'click');
   const resetClick = Rx.Observable.fromEvent(resetButton, 'click');
+  const half = Rx.Observable.fromEvent(halfButton, 'click');
+  const quarter = Rx.Observable.fromEvent(quarterButton, 'click');
   const interval = () => Rx.Observable.interval(1000);
   const stop = Rx.Observable.fromEvent($('#stop'), 'click');
 
@@ -87,7 +91,20 @@ $(document).ready(() => {
     intervalStop.mapTo(inc),
     resetClick.mapTo(reset)
   );
-  const startInterval = start.switchMapTo(incOrReset)
+  const starter = Rx.Observable.merge(
+    start.mapTo(1000),
+    half.mapTo(500),
+    quarter.mapTo(250)
+  );
+
+  const intervalActions = (time) => {
+    return Rx.Observable.merge(
+      Rx.Observable.interval(time).takeUntil(stop).mapTo(inc),
+    resetClick.mapTo(reset)
+  )};
+
+  const startInterval = starter
+    .switchMap(intervalActions)
     .startWith(data)
     .scan((acc, curr) => curr(acc));
   startInterval.subscribe((x) => console.log(x));
