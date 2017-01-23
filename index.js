@@ -107,15 +107,16 @@ $(document).ready(() => {
     // .switchMapTo(incOrReset)
     .startWith(data)
     .scan((acc, curr) => curr(acc));
-  startInterval.subscribe((x) => console.log(x));
+  // startInterval.subscribe((x) => console.log(x));
 
 
   const input = $('#input')
-  const input$ = Rx.Observable.fromEvent(input, 'input').map(event => event.target.value)
+  const input$ = Rx.Observable.fromEvent(input, 'input')
+    .map(event => event.target.value)
+  // input$.subscribe(console.log)
 
-  input$.subscribe(console.log)
-
-
+  Rx.Observable.combineLatest(startInterval, input$, (timer, text) => ({count: timer.count, text}))
+    .subscribe(console.log)
 });
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
