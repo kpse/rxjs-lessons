@@ -109,6 +109,13 @@ $(document).ready(() => {
     .scan((acc, curr) => curr(acc));
   startInterval.subscribe((x) => console.log(x));
 
+
+  const input = $('#input')
+  const input$ = Rx.Observable.fromEvent(input, 'input').map(event => event.target.value)
+
+  input$.subscribe(console.log)
+
+
 });
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
