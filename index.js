@@ -120,8 +120,9 @@ $(document).ready(() => {
     input$,
     (timer, text) => ({count: timer.count, text})
   )
+    .takeWhile((data) => data.count <= 3)
     .filter((data) => data.count == parseInt(data.text))
-    .subscribe(console.log)
+    .subscribe(console.log, console.log, () => console.log('finish!'))
 });
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
