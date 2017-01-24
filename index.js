@@ -122,6 +122,7 @@ $(document).ready(() => {
   )
     .takeWhile((data) => data.count <= 3)
     .filter((data) => data.count == parseInt(data.text))
+    .reduce((acc, curr) => acc + 1, 0)
     .subscribe(console.log, console.log, () => console.log('finish!'))
 });
 
