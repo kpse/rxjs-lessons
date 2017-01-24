@@ -115,7 +115,12 @@ $(document).ready(() => {
     .map(event => event.target.value)
   // input$.subscribe(console.log)
 
-  Rx.Observable.combineLatest(startInterval, input$, (timer, text) => ({count: timer.count, text}))
+  Rx.Observable.combineLatest(
+    startInterval,
+    input$,
+    (timer, text) => ({count: timer.count, text})
+  )
+    .filter((data) => data.count == parseInt(data.text))
     .subscribe(console.log)
 });
 
