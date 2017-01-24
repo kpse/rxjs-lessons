@@ -13,6 +13,66 @@ const result = source
 
 result.subscribe(console.log);
 
+function rxLessons() {
+  const startButton = $('#start');
+  const resetButton = $('#reset');
+  const halfButton = $('#half');
+  const quarterButton = $('#quarter');
+
+  const start = Rx.Observable.fromEvent(startButton, 'click');
+  const resetClick = Rx.Observable.fromEvent(resetButton, 'click');
+  const half = Rx.Observable.fromEvent(halfButton, 'click');
+  const quarter = Rx.Observable.fromEvent(quarterButton, 'click');
+  const stop = Rx.Observable.fromEvent($('#stop'), 'click');
+
+  const intervalStop = Rx.Observable.interval(1000).takeUntil(stop);
+
+  const data = {count: 0};
+  const inc = (acc) => ({count: acc.count + 1});
+  const reset = (acc) => data;
+
+  const incOrReset = Rx.Observable.merge(
+    intervalStop.mapTo(inc),
+    resetClick.mapTo(reset)
+  );
+  const starter = Rx.Observable.merge(
+    start.mapTo(1000),
+    half.mapTo(500),
+    quarter.mapTo(250)
+  );
+
+  const intervalActions = (time) => {
+    return Rx.Observable.merge(
+      Rx.Observable.interval(time).takeUntil(stop).mapTo(inc),
+      resetClick.mapTo(reset)
+    )};
+
+  const startInterval = starter
+    .switchMap(intervalActions)
+    // .switchMapTo(incOrReset)
+    .startWith(data)
+    .scan((acc, curr) => curr(acc));
+  // startInterval.subscribe((x) => console.log(x));
+
+
+  const input = $('#input')
+  const input$ = Rx.Observable.fromEvent(input, 'input')
+    .map(event => event.target.value)
+  // input$.subscribe(console.log)
+
+  Rx.Observable.combineLatest(
+    startInterval,
+    input$,
+    (timer, text) => ({count: timer.count, text})
+  )
+    .do((x)=> console.log(`do ${x}`))
+    .takeWhile((data) => data.count <= 3)
+    .filter((data) => data.count == parseInt(data.text))
+    .reduce((acc, curr) => acc + 1, 0)
+    .subscribe(console.log, console.log, () => console.log('finish!'))
+}
+
+
 $(document).ready(() => {
   const button = $('.button');
   const label = $('.text');
@@ -69,62 +129,7 @@ $(document).ready(() => {
   suggestionStream2.subscribe(_.curry(renderSuggestion)('.suggestion2'));
   suggestionStream3.subscribe(_.curry(renderSuggestion)('.suggestion3'));
 
-  const startButton = $('#start');
-  const resetButton = $('#reset');
-  const halfButton = $('#half');
-  const quarterButton = $('#quarter');
-
-  const start = Rx.Observable.fromEvent(startButton, 'click');
-  const resetClick = Rx.Observable.fromEvent(resetButton, 'click');
-  const half = Rx.Observable.fromEvent(halfButton, 'click');
-  const quarter = Rx.Observable.fromEvent(quarterButton, 'click');
-  const stop = Rx.Observable.fromEvent($('#stop'), 'click');
-
-  const intervalStop = Rx.Observable.interval(1000).takeUntil(stop);
-
-  const data = {count: 0};
-  const inc = (acc) => ({count: acc.count + 1});
-  const reset = (acc) => data;
-
-  const incOrReset = Rx.Observable.merge(
-    intervalStop.mapTo(inc),
-    resetClick.mapTo(reset)
-  );
-  const starter = Rx.Observable.merge(
-    start.mapTo(1000),
-    half.mapTo(500),
-    quarter.mapTo(250)
-  );
-
-  const intervalActions = (time) => {
-    return Rx.Observable.merge(
-      Rx.Observable.interval(time).takeUntil(stop).mapTo(inc),
-    resetClick.mapTo(reset)
-  )};
-
-  const startInterval = starter
-    .switchMap(intervalActions)
-    // .switchMapTo(incOrReset)
-    .startWith(data)
-    .scan((acc, curr) => curr(acc));
-  // startInterval.subscribe((x) => console.log(x));
-
-
-  const input = $('#input')
-  const input$ = Rx.Observable.fromEvent(input, 'input')
-    .map(event => event.target.value)
-  // input$.subscribe(console.log)
-
-  Rx.Observable.combineLatest(
-    startInterval,
-    input$,
-    (timer, text) => ({count: timer.count, text})
-  )
-    .do((x)=> console.log(`do ${x}`))
-    .takeWhile((data) => data.count <= 3)
-    .filter((data) => data.count == parseInt(data.text))
-    .reduce((acc, curr) => acc + 1, 0)
-    .subscribe(console.log, console.log, () => console.log('finish!'))
+  rxLessons();
 });
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
