@@ -120,6 +120,7 @@ $(document).ready(() => {
     input$,
     (timer, text) => ({count: timer.count, text})
   )
+    .do((x)=> console.log(`do ${x}`))
     .takeWhile((data) => data.count <= 3)
     .filter((data) => data.count == parseInt(data.text))
     .reduce((acc, curr) => acc + 1, 0)
