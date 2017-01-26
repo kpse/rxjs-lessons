@@ -13,6 +13,13 @@ const result = source
 
 result.subscribe(console.log);
 
+$(document).ready(() => {
+  githubFollow();
+
+  rxLessons();
+});
+
+//private
 function rxLessons() {
   const startButton = $('#start');
   const resetButton = $('#reset');
@@ -55,9 +62,9 @@ function rxLessons() {
   // startInterval.subscribe((x) => console.log(x));
 
 
-  const input = $('#input')
+  const input = $('#input');
   const input$ = Rx.Observable.fromEvent(input, 'input')
-    .map(event => event.target.value)
+    .map(event => event.target.value);
   // input$.subscribe(console.log)
 
   startInterval
@@ -73,7 +80,7 @@ function rxLessons() {
 }
 
 
-$(document).ready(() => {
+function githubFollow() {
   const button = $('.button');
   const label = $('.text');
   console.log(`button is ${button.textContent}`);
@@ -128,9 +135,7 @@ $(document).ready(() => {
   suggestionStream1.subscribe(_.curry(renderSuggestion)('.suggestion1'));
   suggestionStream2.subscribe(_.curry(renderSuggestion)('.suggestion2'));
   suggestionStream3.subscribe(_.curry(renderSuggestion)('.suggestion3'));
-
-  rxLessons();
-});
+}
 
 const createSuggestionStream = (responseStream, refreshStream, closeClickStream) => {
   let randomUser = listUser => listUser[Math.floor(Math.random() * listUser.length)];
