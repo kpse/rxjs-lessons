@@ -60,14 +60,14 @@ function rxLessons() {
     .map(event => event.target.value)
   // input$.subscribe(console.log)
 
-  Rx.Observable.combineLatest(
-    startInterval,
-    input$,
-    (timer, text) => ({count: timer.count, text})
-  )
-    .do((x)=> console.log(`do ${x}`))
+  startInterval
+    .do((x) => console.log(`do ${x}`))
     .takeWhile((data) => data.count <= 3)
-    .filter((data) => data.count == parseInt(data.text))
+    .withLatestFrom(
+      input$,
+      (timer, text) => ({count: timer.count, text})
+    )
+    .filter((data) => data.count === parseInt(data.text))
     .reduce((acc, curr) => acc + 1, 0)
     .subscribe(console.log, console.log, () => console.log('finish!'))
 }
